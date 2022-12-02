@@ -14,5 +14,6 @@ Advent of Code 2022 solutions written in C, I'm so rusted
 
 ```console
     $ day_1/main path/to/day_1/input/file
+    $ cat path/to/day_1/input/file | day_1/main -
 ```
 

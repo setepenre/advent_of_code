@@ -1,11 +1,12 @@
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 int usage(const char *name) {
     printf("usage: %s input\n", name);
-    printf("\tinput: path to input file\n");
+    printf("\tinput: path to input file, '-' to use stdin\n");
     return EXIT_FAILURE;
 }
 
@@ -17,13 +18,15 @@ long sum(long *array, size_t n) {
     return acc;
 }
 
+static inline bool strequ(const char *s1, const char *s2) { return strcmp(s1, s2) == 0 ? true : false; }
+
 int main(int argc, char *argv[]) {
     if (argc - 1 != 1) {
         return usage(argv[0]);
     }
 
     const char *input = argv[1];
-    FILE *fptr = fopen(input, "r");
+    FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
     if (!fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
@@ -46,7 +49,7 @@ int main(int argc, char *argv[]) {
     size_t current = 0;
     calories[current] = 0;
     while ((nread = getline(&line, &len, fptr)) != -1) {
-        if (!strcmp(line, "\n")) {
+        if (strequ(line, "\n")) {
             if (!(current + 1 < calories_length)) {
                 calories_length *= 2;
                 calories = realloc(calories, calories_length * sizeof(long));
@@ -91,7 +94,9 @@ int main(int argc, char *argv[]) {
     free(calories);
 
     free(line);
-    fclose(fptr);
+    if (fptr != stdin) {
+        fclose(fptr);
+    }
 
     return EXIT_SUCCESS;
 }
