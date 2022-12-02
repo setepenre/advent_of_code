@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     const char *input = argv[1];
     FILE *fptr = fopen(input, "r");
     if (!fptr) {
-        fprintf(stderr, "could not open %s: %s", input, strerror(errno));
+        fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     size_t calories_length = 1;
     long *calories = calloc(calories_length, sizeof(long));
     if (!calories) {
-        fprintf(stderr, "could not allocate %ld bytes: %s", calories_length * sizeof(long), strerror(errno));
+        fprintf(stderr, "could not allocate %ld bytes: %s\n", calories_length * sizeof(long), strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -51,19 +51,20 @@ int main(int argc, char *argv[]) {
                 calories_length *= 2;
                 calories = realloc(calories, calories_length * sizeof(long));
                 if (!calories) {
-                    fprintf(stderr, "could not reallocate %ld bytes: %s", calories_length * sizeof(long),
+                    fprintf(stderr, "could not reallocate %ld bytes: %s\n", calories_length * sizeof(long),
                             strerror(errno));
                     return EXIT_FAILURE;
                 }
             }
             calories[++current] = 0;
+        } else {
+            errno = 0;
+            long v = strtol(line, NULL, 10);
+            if (errno != 0) {
+                fprintf(stderr, "could not convert string '%s' to long: %s\n", line, strerror(errno));
+            }
+            calories[current] += v;
         }
-        errno = 0;
-        long v = strtol(line, NULL, 10);
-        if (errno != 0) {
-            fprintf(stderr, "could not convert string '%s' to long: %s", line, strerror(errno));
-        }
-        calories[current] += v;
     }
 
     long maximums[3] = {0, 0, 0};
