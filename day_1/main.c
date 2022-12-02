@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "helpers.h"
+
 int usage(const char *name) {
     printf("usage: %s input\n", name);
     printf("\tinput: path to input file, '-' to use stdin\n");
@@ -17,8 +19,6 @@ long sum(long *array, size_t n) {
     }
     return acc;
 }
-
-static inline bool strequ(const char *s1, const char *s2) { return strcmp(s1, s2) == 0 ? true : false; }
 
 int main(int argc, char *argv[]) {
     if (argc - 1 != 1) {
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
             calories[current] += v;
         }
     }
+    calories_length = current;
 
     long maximums[3] = {0, 0, 0};
     for (size_t i = 0; i < calories_length; ++i) {

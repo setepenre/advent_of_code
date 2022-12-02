@@ -1,6 +1,6 @@
 # Advent of Code - 2022
 
-Advent of Code 2022 solutions written in C, I'm so rusted
+Advent of Code 2022 (https://adventofcode.com/) solutions written in C, I'm so rusted
 
 ## setup
 
@@ -13,7 +13,7 @@ Advent of Code 2022 solutions written in C, I'm so rusted
 ## run
 
 ```console
-    $ day_1/main path/to/day_1/input/file
-    $ cat path/to/day_1/input/file | day_1/main -
+    $ day_n/main path/to/day_n/input/file
+    $ cat path/to/day_n/input/file | day_n/main -
 ```
 
