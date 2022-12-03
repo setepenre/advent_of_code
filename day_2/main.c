@@ -37,9 +37,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("--- Part One ---\n");
-    printf("What would your total score be if everything goes exactly according to your strategy guide?\n");
-
     char *line = NULL;
     size_t len = 0;
     ssize_t nread;
@@ -47,7 +44,7 @@ int main(int argc, char *argv[]) {
     size_t rounds_length = 1;
     round *rounds = calloc(rounds_length, sizeof(round));
     if (!rounds) {
-        fprintf(stderr, "could not allocate %ld bytes: %s\n", rounds_length * sizeof(long), strerror(errno));
+        fprintf(stderr, "could not allocate %ld bytes: %s\n", rounds_length * sizeof(round), strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -59,9 +56,9 @@ int main(int argc, char *argv[]) {
 
         if (!(current + 1 < rounds_length)) {
             rounds_length *= 2;
-            rounds = realloc(rounds, rounds_length * sizeof(long));
+            rounds = realloc(rounds, rounds_length * sizeof(round));
             if (!rounds) {
-                fprintf(stderr, "could not reallocate %ld bytes: %s\n", rounds_length * sizeof(long), strerror(errno));
+                fprintf(stderr, "could not reallocate %ld bytes: %s\n", rounds_length * sizeof(round), strerror(errno));
                 return EXIT_FAILURE;
             }
         }
@@ -77,30 +74,39 @@ int main(int argc, char *argv[]) {
     rounds_length = current;
 
     {
+        printf("--- Part One ---\n");
+        printf("What would your total score be if everything goes exactly according to your strategy guide?\n");
+
         int total_score = 0;
         for (size_t i = 0; i < rounds_length; ++i) {
             int score = score_round((hand)(rounds[i].hint - 'X' + 'A'), (hand)(rounds[i].opponent));
             total_score += score + (int)(rounds[i].hint - 'X' + 1);
         }
+
         printf("The total score if everything goes exactly according to the strategy guide would be %d\n", total_score);
     }
 
-    printf("--- Part Two ---\n");
-    printf("Following the Elf's instructions for the second column, what would your total score be if everything goes "
-           "exactly according to your strategy guide?\n");
-
     {
+        printf("--- Part Two ---\n");
+        printf(
+            "Following the Elf's instructions for the second column, what would your total score be if everything goes "
+            "exactly according to your strategy guide?\n");
+
         int total_score = 0;
         for (size_t i = 0; i < rounds_length; ++i) {
             hand player = resolve((hand)rounds[i].opponent, (target)rounds[i].hint);
             total_score += score_round(player, (hand)(rounds[i].opponent)) + (int)(player - 'A' + 1);
         }
+
         printf("The total score if everything goes exactly according to the strategy guide would be %d\n", total_score);
     }
 
-    free(line);
-
     free(rounds);
+
+    free(line);
+    if (fptr != stdin) {
+        fclose(fptr);
+    }
 
     return EXIT_SUCCESS;
 }

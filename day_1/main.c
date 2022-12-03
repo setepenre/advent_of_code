@@ -32,9 +32,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("--- Part One ---\n");
-    printf("Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?\n");
-
     char *line = NULL;
     size_t len = 0;
     ssize_t nread;
@@ -83,6 +80,9 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    printf("--- Part One ---\n");
+    printf("Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?\n");
 
     printf("The Elf carrying the most Calories is carrying %ld Calories\n", maximums[0]);
 
