@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t nread;
 
     size_t rucksacks_length = 1;
     rucksack *rucksacks = calloc(rucksacks_length, sizeof(rucksack));
@@ -81,7 +80,7 @@ int main(int argc, char *argv[]) {
     }
 
     size_t current = 0;
-    while ((nread = getline(&line, &len, fptr)) != -1) {
+    while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             continue;
         }

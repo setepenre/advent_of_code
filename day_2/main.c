@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t nread;
 
     size_t rounds_length = 1;
     round *rounds = calloc(rounds_length, sizeof(round));
@@ -49,7 +48,7 @@ int main(int argc, char *argv[]) {
     }
 
     size_t current = 0;
-    while ((nread = getline(&line, &len, fptr)) != -1) {
+    while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             continue;
         }

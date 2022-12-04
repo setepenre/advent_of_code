@@ -34,7 +34,6 @@ int main(int argc, char *argv[]) {
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t nread;
 
     size_t calories_length = 1;
     long *calories = calloc(calories_length, sizeof(long));
@@ -45,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     size_t current = 0;
     calories[current] = 0;
-    while ((nread = getline(&line, &len, fptr)) != -1) {
+    while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             if (!(current + 1 < calories_length)) {
                 calories_length *= 2;
