@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "array.h"
 #include "helpers.h"
+
+ARRAY(long, long_array)
 
 int usage(const char *name) {
     printf("usage: %s input\n", name);
@@ -35,46 +38,37 @@ int main(int argc, char *argv[]) {
     char *line = NULL;
     size_t len = 0;
 
-    size_t calories_length = 1;
-    long *calories = calloc(calories_length, sizeof(long));
-    if (!calories) {
-        fprintf(stderr, "could not allocate %ld bytes: %s\n", calories_length * sizeof(long), strerror(errno));
+    long_array calories = {0, 0, NULL};
+    if (!long_array_append(&calories, 0)) {
+        fprintf(stderr, "could not allocate %ld bytes: %s\n", calories.cap * sizeof(long), strerror(errno));
         return EXIT_FAILURE;
     }
 
-    size_t current = 0;
-    calories[current] = 0;
     while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
-            if (!(current + 1 < calories_length)) {
-                calories_length *= 2;
-                calories = realloc(calories, calories_length * sizeof(long));
-                if (!calories) {
-                    fprintf(stderr, "could not reallocate %ld bytes: %s\n", calories_length * sizeof(long),
-                            strerror(errno));
-                    return EXIT_FAILURE;
-                }
+            if (!long_array_append(&calories, 0)) {
+                fprintf(stderr, "could not reallocate %ld bytes: %s\n", calories.cap * sizeof(long), strerror(errno));
+                return EXIT_FAILURE;
             }
-            calories[++current] = 0;
         } else {
             errno = 0;
             long v = strtol(line, NULL, 10);
             if (errno != 0) {
                 fprintf(stderr, "could not convert string '%s' to long: %s\n", line, strerror(errno));
+                return EXIT_FAILURE;
             }
-            calories[current] += v;
+            calories.data[calories.len - 1] += v;
         }
     }
-    calories_length = current;
 
     long maximums[3] = {0, 0, 0};
-    for (size_t i = 0; i < calories_length; ++i) {
+    for (size_t i = 0; i < calories.len; ++i) {
         for (size_t j = 0; j < 3; ++j) {
-            if (calories[i] > maximums[j]) {
+            if (calories.data[i] > maximums[j]) {
                 for (size_t k = 2; k > j; --k) {
                     maximums[k] = maximums[k - 1];
                 }
-                maximums[j] = calories[i];
+                maximums[j] = calories.data[i];
                 break;
             }
         }
@@ -91,7 +85,7 @@ int main(int argc, char *argv[]) {
 
     printf("The top three Elves carrying the most Calories are carrying %ld Calories in total\n", sum(maximums, 3));
 
-    free(calories);
+    long_array_free(&calories);
 
     free(line);
     if (fptr != stdin) {

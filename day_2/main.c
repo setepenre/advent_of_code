@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "array.h"
 #include "helpers.h"
 
 int usage(const char *name) {
@@ -10,9 +11,11 @@ int usage(const char *name) {
     return EXIT_FAILURE;
 }
 
-typedef struct round {
+typedef struct {
     char opponent, hint;
 } round;
+
+ARRAY(round, round_array)
 
 typedef enum hand { ROCK = 'A', PAPER = 'B', SCISSOR = 'C' } hand;
 typedef enum target { LOSE = 'X', DRAW = 'Y', WIN = 'Z' } target;
@@ -40,26 +43,10 @@ int main(int argc, char *argv[]) {
     char *line = NULL;
     size_t len = 0;
 
-    size_t rounds_length = 1;
-    round *rounds = calloc(rounds_length, sizeof(round));
-    if (!rounds) {
-        fprintf(stderr, "could not allocate %ld bytes: %s\n", rounds_length * sizeof(round), strerror(errno));
-        return EXIT_FAILURE;
-    }
-
-    size_t current = 0;
+    round_array rounds = {0, 0, NULL};
     while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             continue;
-        }
-
-        if (!(current + 1 < rounds_length)) {
-            rounds_length *= 2;
-            rounds = realloc(rounds, rounds_length * sizeof(round));
-            if (!rounds) {
-                fprintf(stderr, "could not reallocate %ld bytes: %s\n", rounds_length * sizeof(round), strerror(errno));
-                return EXIT_FAILURE;
-            }
         }
 
         round r;
@@ -68,18 +55,20 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        rounds[current++] = r;
+        if (!round_array_append(&rounds, r)) {
+            fprintf(stderr, "could not reallocate %ld bytes: %s\n", rounds.cap * sizeof(round), strerror(errno));
+            return EXIT_FAILURE;
+        }
     }
-    rounds_length = current;
 
     {
         printf("--- Part One ---\n");
         printf("What would your total score be if everything goes exactly according to your strategy guide?\n");
 
         int total_score = 0;
-        for (size_t i = 0; i < rounds_length; ++i) {
-            int score = score_round((hand)(rounds[i].hint - 'X' + 'A'), (hand)(rounds[i].opponent));
-            total_score += score + (int)(rounds[i].hint - 'X' + 1);
+        for (size_t i = 0; i < rounds.len; ++i) {
+            int score = score_round((hand)(rounds.data[i].hint - 'X' + 'A'), (hand)(rounds.data[i].opponent));
+            total_score += score + (int)(rounds.data[i].hint - 'X' + 1);
         }
 
         printf("The total score if everything goes exactly according to the strategy guide would be %d\n", total_score);
@@ -92,15 +81,15 @@ int main(int argc, char *argv[]) {
             "exactly according to your strategy guide?\n");
 
         int total_score = 0;
-        for (size_t i = 0; i < rounds_length; ++i) {
-            hand player = resolve((hand)rounds[i].opponent, (target)rounds[i].hint);
-            total_score += score_round(player, (hand)(rounds[i].opponent)) + (int)(player - 'A' + 1);
+        for (size_t i = 0; i < rounds.len; ++i) {
+            hand player = resolve((hand)rounds.data[i].opponent, (target)rounds.data[i].hint);
+            total_score += score_round(player, (hand)(rounds.data[i].opponent)) + (int)(player - 'A' + 1);
         }
 
         printf("The total score if everything goes exactly according to the strategy guide would be %d\n", total_score);
     }
 
-    free(rounds);
+    round_array_free(&rounds);
 
     free(line);
     if (fptr != stdin) {

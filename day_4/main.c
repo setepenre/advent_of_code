@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "array.h"
 #include "helpers.h"
 
 int usage(const char *name) {
@@ -12,13 +13,15 @@ int usage(const char *name) {
     return EXIT_FAILURE;
 }
 
-typedef struct pair {
+typedef struct {
     int start, end;
 } pair;
 
-typedef struct assignment {
+typedef struct {
     pair left, right;
 } assignment;
+
+ARRAY(assignment, assignment_array)
 
 static inline bool contains(pair a, pair b) { return b.start >= a.start && b.end <= a.end; }
 static inline bool overlaps(pair a, pair b) {
@@ -40,41 +43,28 @@ int main(int argc, char *argv[]) {
     char *line = NULL;
     size_t len = 0;
 
-    size_t assignments_length = 1;
-    assignment *assignments = calloc(assignments_length, sizeof(assignment));
-    if (!assignments) {
-        fprintf(stderr, "could not allocate %ld bytes: %s\n", assignments_length * sizeof(assignment), strerror(errno));
-        return EXIT_FAILURE;
-    }
-    size_t current = 0;
+    assignment_array assignments = {0, 0, NULL};
     while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             continue;
         }
 
-        if (!(current + 1 < assignments_length)) {
-            assignments_length *= 2;
-            assignments = realloc(assignments, assignments_length * sizeof(assignment));
-            if (!assignments) {
-                fprintf(stderr, "could not reallocate %ld bytes: %s\n", assignments_length * sizeof(assignment),
-                        strerror(errno));
-                return EXIT_FAILURE;
-            }
-        }
-
         assignment pairs;
         sscanf(line, "%d-%d,%d-%d\n", &pairs.left.start, &pairs.left.end, &pairs.right.start, &pairs.right.end);
-        assignments[current++] = pairs;
+        if (!assignment_array_append(&assignments, pairs)) {
+            fprintf(stderr, "could not reallocate %ld bytes: %s\n", assignments.len * sizeof(assignment),
+                    strerror(errno));
+            return EXIT_FAILURE;
+        }
     }
-    assignments_length = current;
 
     {
         printf("--- Part One ---\n");
         printf("In how many assignment pairs does one range fully contain the other?\n");
         int count = 0;
-        for (size_t i = 0; i < assignments_length; ++i) {
-            if (contains(assignments[i].left, assignments[i].right) ||
-                contains(assignments[i].right, assignments[i].left)) {
+        for (size_t i = 0; i < assignments.len; ++i) {
+            if (contains(assignments.data[i].left, assignments.data[i].right) ||
+                contains(assignments.data[i].right, assignments.data[i].left)) {
                 count++;
             }
         }
@@ -84,16 +74,16 @@ int main(int argc, char *argv[]) {
         printf("--- Part Two ---\n");
         printf("In how many assignment pairs do the ranges overlap?\n");
         int count = 0;
-        for (size_t i = 0; i < assignments_length; ++i) {
-            if (overlaps(assignments[i].left, assignments[i].right) ||
-                overlaps(assignments[i].right, assignments[i].left)) {
+        for (size_t i = 0; i < assignments.len; ++i) {
+            if (overlaps(assignments.data[i].left, assignments.data[i].right) ||
+                overlaps(assignments.data[i].right, assignments.data[i].left)) {
                 count++;
             }
         }
         printf("The rangers overlap in %d assignments.\n", count);
     }
 
-    free(assignments);
+    assignment_array_free(&assignments);
 
     free(line);
     if (fptr != stdin) {

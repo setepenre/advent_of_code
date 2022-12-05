@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "array.h"
 #include "helpers.h"
 
 int usage(const char *name) {
@@ -12,9 +13,21 @@ int usage(const char *name) {
     return EXIT_FAILURE;
 }
 
-typedef struct rucksack {
+typedef struct {
     char *first, *second;
 } rucksack;
+
+void rucksack_free(rucksack *r) {
+    if (r->first) {
+        free(r->first);
+    }
+
+    if (r->second) {
+        free(r->second);
+    }
+}
+
+ARRAY(rucksack, rucksack_array)
 
 u_int64_t char_bitset(const char *s) {
     u_int64_t set = 0;
@@ -72,27 +85,10 @@ int main(int argc, char *argv[]) {
     char *line = NULL;
     size_t len = 0;
 
-    size_t rucksacks_length = 1;
-    rucksack *rucksacks = calloc(rucksacks_length, sizeof(rucksack));
-    if (!rucksacks) {
-        fprintf(stderr, "could not allocate %ld bytes: %s\n", rucksacks_length * sizeof(rucksack), strerror(errno));
-        return EXIT_FAILURE;
-    }
-
-    size_t current = 0;
+    rucksack_array rucksacks = {0, 0, NULL};
     while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
             continue;
-        }
-
-        if (!(current + 1 < rucksacks_length)) {
-            rucksacks_length *= 2;
-            rucksacks = realloc(rucksacks, rucksacks_length * sizeof(rucksack));
-            if (!rucksacks) {
-                fprintf(stderr, "could not reallocate %ld bytes: %s\n", rucksacks_length * sizeof(rucksack),
-                        strerror(errno));
-                return EXIT_FAILURE;
-            }
         }
 
         size_t line_length = strlen(line) - 1;
@@ -103,9 +99,12 @@ int main(int argc, char *argv[]) {
         }
         strncat(sack.first, line, line_length / 2);
         strncat(sack.second, line + line_length / 2, line_length / 2);
-        rucksacks[current++] = sack;
+
+        if (!rucksack_array_append(&rucksacks, sack)) {
+            fprintf(stderr, "could not reallocate %ld bytes: %s\n", rucksacks.cap * sizeof(rucksack), strerror(errno));
+            return EXIT_FAILURE;
+        }
     }
-    rucksacks_length = current;
 
     {
         printf("--- Part One ---\n");
@@ -114,8 +113,8 @@ int main(int argc, char *argv[]) {
             "of those item types?\n");
 
         int priority_sum = 0;
-        for (size_t i = 0; i < rucksacks_length; ++i) {
-            char *s = bitset_char(char_bitset(rucksacks[i].first) & char_bitset(rucksacks[i].second));
+        for (size_t i = 0; i < rucksacks.len; ++i) {
+            char *s = bitset_char(char_bitset(rucksacks.data[i].first) & char_bitset(rucksacks.data[i].second));
             if (!s) {
                 fprintf(stderr, "could not convert bitset to char: %s\n", strerror(errno));
                 return EXIT_FAILURE;
@@ -134,15 +133,17 @@ int main(int argc, char *argv[]) {
 
         int priority_sum = 0;
         char *buffer[3] = {NULL, NULL, NULL};
-        for (size_t i = 0; i < rucksacks_length; ++i) {
-            buffer[i % 3] = calloc(strlen(rucksacks[i].first) + strlen(rucksacks[i].second) + 1, sizeof(char));
+        for (size_t i = 0; i < rucksacks.len; ++i) {
+            buffer[i % 3] =
+                calloc(strlen(rucksacks.data[i].first) + strlen(rucksacks.data[i].second) + 1, sizeof(char));
             if (!buffer[i % 3]) {
                 fprintf(stderr, "could not allocate %ld bytes: %s\n",
-                        (strlen(rucksacks[i].first) + strlen(rucksacks[i].second)) * sizeof(char), strerror(errno));
+                        (strlen(rucksacks.data[i].first) + strlen(rucksacks.data[i].second)) * sizeof(char),
+                        strerror(errno));
                 return EXIT_FAILURE;
             }
-            strcat(buffer[i % 3], rucksacks[i].first);
-            strcat(buffer[i % 3], rucksacks[i].second);
+            strcat(buffer[i % 3], rucksacks.data[i].first);
+            strcat(buffer[i % 3], rucksacks.data[i].second);
 
             if (i % 3 == 2) {
                 u_int64_t set = 0xffffffffffffffff;
@@ -164,11 +165,10 @@ int main(int argc, char *argv[]) {
         printf("The sum of the priorities is %d\n", priority_sum);
     }
 
-    for (size_t i = 0; i < rucksacks_length; ++i) {
-        free(rucksacks[i].first);
-        free(rucksacks[i].second);
+    for (size_t i = 0; i < rucksacks.len; ++i) {
+        rucksack_free(&rucksacks.data[i]);
     }
-    free(rucksacks);
+    rucksack_array_free(&rucksacks);
 
     free(line);
     if (fptr != stdin) {
