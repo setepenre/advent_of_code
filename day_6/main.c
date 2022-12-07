@@ -71,9 +71,6 @@ int main(int argc, char *argv[]) {
             buffer[len - 1] = c;
 
             if (count >= len && all_different(buffer, len)) {
-                char *s = calloc(len + 1, sizeof(char));
-                memcpy(s, buffer, len);
-                printf("%s\n", s);
                 break;
             }
         }
