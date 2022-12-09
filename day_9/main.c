@@ -76,9 +76,9 @@ vec2i_t follow(vec2i_t head, vec2i_t tail) {
 
 ARRAY(vec2i_t, vec2i_t_array)
 
-bool vec2i_is_in_array(vec2i_t v, vec2i_t_array array) {
-    for (size_t i = 0; i < array.len; ++i) {
-        if (vec2i_equ(v, array.data[i])) {
+bool vec2i_is_in_array(vec2i_t v, const vec2i_t_array *array) {
+    for (size_t i = 0; i < array->len; ++i) {
+        if (vec2i_equ(v, array->data[i])) {
             return true;
         }
     }
@@ -133,20 +133,14 @@ int main(int argc, char *argv[]) {
 
             for (size_t j = 0; j < move.steps; ++j) {
                 head = vec2i_add(head, delta);
-                vec2i_t_array_append(&tail_positions, tail = follow(head, tail));
+                if (not vec2i_is_in_array(tail = follow(head, tail), &tail_positions)) {
+                    vec2i_t_array_append(&tail_positions, tail);
+                }
             }
         }
 
-        vec2i_t_array uniques = {0, 0, NULL};
-        for (size_t i = 0; i < tail_positions.len; ++i) {
-            if (not vec2i_is_in_array(tail_positions.data[i], uniques)) {
-                vec2i_t_array_append(&uniques, tail_positions.data[i]);
-            }
-        }
+        printf("The tail of the rope visited %zu positions at least once.\n", tail_positions.len);
 
-        printf("The tail of the rope visited %zu positions at least once.\n", uniques.len);
-
-        vec2i_t_array_free(&uniques);
         vec2i_t_array_free(&tail_positions);
     }
 
@@ -172,20 +166,14 @@ int main(int argc, char *argv[]) {
                 for (size_t k = 1; k < 10; ++k) {
                     knots.data[k] = follow(knots.data[k - 1], knots.data[k]);
                 }
-                vec2i_t_array_append(&tail_positions, knots.data[9]);
+                if (not vec2i_is_in_array(knots.data[9], &tail_positions)) {
+                    vec2i_t_array_append(&tail_positions, knots.data[9]);
+                }
             }
         }
 
-        vec2i_t_array uniques = {0, 0, NULL};
-        for (size_t i = 0; i < tail_positions.len; ++i) {
-            if (not vec2i_is_in_array(tail_positions.data[i], uniques)) {
-                vec2i_t_array_append(&uniques, tail_positions.data[i]);
-            }
-        }
+        printf("The tail of the rope visited %zu positions at least once.\n", tail_positions.len);
 
-        printf("The tail of the rope visited %zu positions at least once.\n", uniques.len);
-
-        vec2i_t_array_free(&uniques);
         vec2i_t_array_free(&tail_positions);
         vec2i_t_array_free(&knots);
     }
