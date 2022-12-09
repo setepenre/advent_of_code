@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -45,7 +46,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        if (!(strlen(line) - 1 > 0)) {
+        if (not(strlen(line) - 1 > 0)) {
             continue;
         }
 
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
         }
 
         for (char *c = line; *c != '\n'; ++c) {
-            if (*c < '0' || *c > '9') {
+            if (*c < '0' or *c > '9') {
                 continue;
             }
             int_array_append(&heights, *c - '0');
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]) {
         size_t_array visibility = {0, 0, NULL};
         for (size_t i = 0; i < rows; ++i) {
             for (size_t j = 0; j < cols; ++j) {
-                size_t_array_append(&visibility, (i == 0 || i == rows - 1 || j == 0 || j == cols - 1) ? 1 : 0);
+                size_t_array_append(&visibility, (i == 0 or i == rows - 1 or j == 0 or j == cols - 1) ? 1 : 0);
             }
         }
 

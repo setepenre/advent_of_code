@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,12 +23,12 @@ static inline const char *fmt_node(node_t *node) {
 }
 
 size_t compute_tree_size(node_t *node) {
-    if (!node) {
+    if (not node) {
         return 0;
     }
 
     size_t size = node->size;
-    for (node_t *cursor = node->children; cursor != NULL && cursor < node->children + node->children_count; ++cursor) {
+    for (node_t *cursor = node->children; cursor != NULL and cursor < node->children + node->children_count; ++cursor) {
         size += compute_tree_size(cursor);
     }
 
@@ -36,17 +37,17 @@ size_t compute_tree_size(node_t *node) {
 
 bool part_one_predicate(node_t *node, void *data) {
     (void)data;
-    return node->size == 0 && compute_tree_size(node) <= 100000;
+    return node->size == 0 and compute_tree_size(node) <= 100000;
 }
 
 bool part_two_predicate(node_t *node, void *data) {
     size_t minimal_size = *(size_t *)data;
-    return node->size == 0 && compute_tree_size(node) > minimal_size;
+    return node->size == 0 and compute_tree_size(node) > minimal_size;
 }
 
 node_t_ptr_array filter_tree(node_t *node, bool (*f)(node_t *, void *), void *data) {
     node_t_ptr_array acc = {0, 0, NULL};
-    if (!node) {
+    if (not node) {
         return acc;
     }
 
@@ -54,7 +55,7 @@ node_t_ptr_array filter_tree(node_t *node, bool (*f)(node_t *, void *), void *da
         node_t_ptr_array_append(&acc, node);
     }
 
-    for (node_t *cursor = node->children; cursor != NULL && cursor < node->children + node->children_count; ++cursor) {
+    for (node_t *cursor = node->children; cursor != NULL and cursor < node->children + node->children_count; ++cursor) {
         node_t_ptr_array arr = filter_tree(cursor, f, data);
         node_t_ptr_array_concat(&acc, &arr);
         node_t_ptr_array_free(&arr);
@@ -64,7 +65,7 @@ node_t_ptr_array filter_tree(node_t *node, bool (*f)(node_t *, void *), void *da
 }
 
 void print_tree(node_t *node, const char *prefix) {
-    if (!node) {
+    if (not node) {
         return;
     }
 
@@ -73,7 +74,7 @@ void print_tree(node_t *node, const char *prefix) {
     char *subprefix = calloc(strlen(prefix) + 2 + 1, sizeof(char));
     sprintf(subprefix, "  %s", prefix);
 
-    for (node_t *cursor = node->children; cursor != NULL && cursor < node->children + node->children_count; ++cursor) {
+    for (node_t *cursor = node->children; cursor != NULL and cursor < node->children + node->children_count; ++cursor) {
         print_tree(cursor, subprefix);
     }
 
@@ -81,11 +82,11 @@ void print_tree(node_t *node, const char *prefix) {
 }
 
 void delete_tree(node_t *node) {
-    if (!node) {
+    if (not node) {
         return;
     }
 
-    for (node_t *cursor = node->children; cursor != NULL && cursor < node->children + node->children_count; ++cursor) {
+    for (node_t *cursor = node->children; cursor != NULL and cursor < node->children + node->children_count; ++cursor) {
         delete_tree(cursor);
         free(cursor->name);
     }
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]) {
             }
 
             for (node_t *cursor = current->children;
-                 cursor != NULL && cursor < current->children + current->children_count; ++cursor) {
+                 cursor != NULL and cursor < current->children + current->children_count; ++cursor) {
                 if (strequ(cursor->name, arg)) {
                     current = cursor;
                     break;
@@ -144,10 +145,10 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (strnequ(line + 2, "ls", 2) && !current->children) {
+        if (strnequ(line + 2, "ls", 2) and not current->children) {
             size_t children_count = 0;
             node_t *children = NULL;
-            while (getline(&line, &len, fptr) != -1 && line[0] != '$') {
+            while (getline(&line, &len, fptr) != -1 and line[0] != '$') {
                 const size_t name_length = (size_t)((line + strlen(line) - 1) - strchr(line, ' '));
                 char name[name_length];
                 size_t size = 0;
@@ -158,15 +159,15 @@ int main(int argc, char *argv[]) {
                 }
 
                 node_t node = {calloc(strlen(name) + 1, sizeof(char)), size, current, 0, NULL};
-                if (!node.name) {
+                if (not node.name) {
                     fprintf(stderr, "could not allocate %ld bytes to store node.name: %s\n",
                             strlen(name) * sizeof(char), strerror(errno));
                     return EXIT_FAILURE;
                 }
                 sprintf(node.name, "%s", name);
-                children = !children ? calloc(++children_count, sizeof(node_t))
-                                     : realloc(children, (++children_count) * sizeof(node_t));
-                if (!children) {
+                children = not children ? calloc(++children_count, sizeof(node_t))
+                                        : realloc(children, (++children_count) * sizeof(node_t));
+                if (not children) {
                     fprintf(stderr, "could not allocate %ld bytes to grow children array: %s\n",
                             children_count * sizeof(node_t), strerror(errno));
                 }
@@ -206,7 +207,7 @@ int main(int argc, char *argv[]) {
 
         size_t minimal_size = 30000000 - (70000000 - compute_tree_size(&root));
         node_t_ptr_array directories = filter_tree(&root, part_two_predicate, (void *)&minimal_size);
-        if (!(directories.len > 0)) {
+        if (not(directories.len > 0)) {
             fprintf(stderr, "could not find any directory matching predicate\n");
             return EXIT_FAILURE;
         }

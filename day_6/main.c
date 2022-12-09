@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
             memmove(buffer, buffer + 1, len - 1);
             buffer[len - 1] = c;
 
-            if (count >= len && all_different(buffer, len)) {
+            if (count >= len and all_different(buffer, len)) {
                 break;
             }
         }
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]) {
             memmove(buffer, buffer + 1, len - 1);
             buffer[len - 1] = c;
 
-            if (count >= len && all_different(buffer, len)) {
+            if (count >= len and all_different(buffer, len)) {
                 break;
             }
         }

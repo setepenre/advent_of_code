@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        if (!round_array_append(&rounds, r)) {
+        if (not round_array_append(&rounds, r)) {
             fprintf(stderr, "could not reallocate %ld bytes: %s\n", rounds.cap * sizeof(round), strerror(errno));
             return EXIT_FAILURE;
         }

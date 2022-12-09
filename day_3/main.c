@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +46,7 @@ char *bitset_char(u_int64_t set) {
         }
     }
     char *s = calloc(count + 1, sizeof(char));
-    if (!s) {
+    if (not s) {
         return NULL;
     }
     size_t current = 0;
@@ -59,7 +60,7 @@ char *bitset_char(u_int64_t set) {
 }
 
 int priority(char c) {
-    if (c < 'A' || c > 'z') {
+    if (c < 'A' or c > 'z') {
         return 0;
     }
 
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -93,14 +94,14 @@ int main(int argc, char *argv[]) {
 
         size_t line_length = strlen(line) - 1;
         rucksack sack = {calloc(line_length / 2 + 1, sizeof(char)), calloc(line_length / 2 + 1, sizeof(char))};
-        if (!sack.first || !sack.second) {
+        if (not sack.first or not sack.second) {
             fprintf(stderr, "could not allocate %ld bytes: %s\n", line_length / 2 * sizeof(char), strerror(errno));
             return EXIT_FAILURE;
         }
         strncat(sack.first, line, line_length / 2);
         strncat(sack.second, line + line_length / 2, line_length / 2);
 
-        if (!rucksack_array_append(&rucksacks, sack)) {
+        if (not rucksack_array_append(&rucksacks, sack)) {
             fprintf(stderr, "could not reallocate %ld bytes: %s\n", rucksacks.cap * sizeof(rucksack), strerror(errno));
             return EXIT_FAILURE;
         }
@@ -115,7 +116,7 @@ int main(int argc, char *argv[]) {
         int priority_sum = 0;
         for (size_t i = 0; i < rucksacks.len; ++i) {
             char *s = bitset_char(char_bitset(rucksacks.data[i].first) & char_bitset(rucksacks.data[i].second));
-            if (!s) {
+            if (not s) {
                 fprintf(stderr, "could not convert bitset to char: %s\n", strerror(errno));
                 return EXIT_FAILURE;
             }
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]) {
         for (size_t i = 0; i < rucksacks.len; ++i) {
             buffer[i % 3] =
                 calloc(strlen(rucksacks.data[i].first) + strlen(rucksacks.data[i].second) + 1, sizeof(char));
-            if (!buffer[i % 3]) {
+            if (not buffer[i % 3]) {
                 fprintf(stderr, "could not allocate %ld bytes: %s\n",
                         (strlen(rucksacks.data[i].first) + strlen(rucksacks.data[i].second)) * sizeof(char),
                         strerror(errno));
@@ -153,7 +154,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 char *s = bitset_char(set);
-                if (!s) {
+                if (not s) {
                     fprintf(stderr, "could not convert bitset to char: %s\n", strerror(errno));
                     return EXIT_FAILURE;
                 }

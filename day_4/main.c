@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,9 +24,9 @@ typedef struct {
 
 ARRAY(assignment, assignment_array)
 
-static inline bool contains(pair a, pair b) { return b.start >= a.start && b.end <= a.end; }
+static inline bool contains(pair a, pair b) { return b.start >= a.start and b.end <= a.end; }
 static inline bool overlaps(pair a, pair b) {
-    return (b.start >= a.start && b.start <= a.end) || (b.end >= a.start && b.end <= a.end);
+    return (b.start >= a.start and b.start <= a.end) or (b.end >= a.start and b.end <= a.end);
 }
 
 int main(int argc, char *argv[]) {
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
 
         assignment pairs;
         sscanf(line, "%d-%d,%d-%d\n", &pairs.left.start, &pairs.left.end, &pairs.right.start, &pairs.right.end);
-        if (!assignment_array_append(&assignments, pairs)) {
+        if (not assignment_array_append(&assignments, pairs)) {
             fprintf(stderr, "could not reallocate %ld bytes: %s\n", assignments.len * sizeof(assignment),
                     strerror(errno));
             return EXIT_FAILURE;
@@ -63,7 +64,7 @@ int main(int argc, char *argv[]) {
         printf("In how many assignment pairs does one range fully contain the other?\n");
         int count = 0;
         for (size_t i = 0; i < assignments.len; ++i) {
-            if (contains(assignments.data[i].left, assignments.data[i].right) ||
+            if (contains(assignments.data[i].left, assignments.data[i].right) or
                 contains(assignments.data[i].right, assignments.data[i].left)) {
                 count++;
             }
@@ -75,7 +76,7 @@ int main(int argc, char *argv[]) {
         printf("In how many assignment pairs do the ranges overlap?\n");
         int count = 0;
         for (size_t i = 0; i < assignments.len; ++i) {
-            if (overlaps(assignments.data[i].left, assignments.data[i].right) ||
+            if (overlaps(assignments.data[i].left, assignments.data[i].right) or
                 overlaps(assignments.data[i].right, assignments.data[i].left)) {
                 count++;
             }

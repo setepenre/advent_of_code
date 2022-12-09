@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
         }
         row[n_stacks] = '\0';
 
-        if (!charptr_array_append(&rows, row)) {
+        if (not charptr_array_append(&rows, row)) {
             fprintf(stderr, "could not reallocate %ld bytes: %s\n", rows.len * sizeof(char *), strerror(errno));
             return EXIT_FAILURE;
         }
@@ -73,7 +74,7 @@ int main(int argc, char *argv[]) {
         sscanf(line, "move %zu from %zu to %zu\n", &m.quantity, &m.from, &m.to);
         m.from -= 1;
         m.to -= 1;
-        if (!move_array_append(&moves, m)) {
+        if (not move_array_append(&moves, m)) {
             fprintf(stderr, "could not reallocate %ld bytes: %s\n", moves.len * sizeof(move), strerror(errno));
             return EXIT_FAILURE;
         }
@@ -88,11 +89,11 @@ int main(int argc, char *argv[]) {
                 if (rows.data[rows.len - 1 - i][j] == ' ') {
                     continue;
                 }
-                if (!(stacks.len > j)) {
+                if (not(stacks.len > j)) {
                     char_stack stack = {0, 0, NULL};
                     char_stack_array_append(&stacks, stack);
                 }
-                if (!char_stack_push(&stacks.data[j], rows.data[rows.len - 1 - i][j])) {
+                if (not char_stack_push(&stacks.data[j], rows.data[rows.len - 1 - i][j])) {
                     fprintf(stderr, "could not reallocate %ld bytes: %s\n", stacks.data[j].cap * sizeof(char),
                             strerror(errno));
                     return EXIT_FAILURE;
@@ -107,7 +108,7 @@ int main(int argc, char *argv[]) {
                 if (from->len == 0) {
                     continue;
                 }
-                if (!char_stack_push(to, char_stack_pop(from))) {
+                if (not char_stack_push(to, char_stack_pop(from))) {
                     fprintf(stderr, "could not reallocate %ld bytes: %s\n", to->cap * sizeof(char), strerror(errno));
                     return EXIT_FAILURE;
                 }
@@ -140,11 +141,11 @@ int main(int argc, char *argv[]) {
                 if (rows.data[rows.len - 1 - i][j] == ' ') {
                     continue;
                 }
-                if (!(stacks.len > j)) {
+                if (not(stacks.len > j)) {
                     char_stack stack = {0, 0, NULL};
                     char_stack_array_append(&stacks, stack);
                 }
-                if (!char_stack_push(&stacks.data[j], rows.data[rows.len - 1 - i][j])) {
+                if (not char_stack_push(&stacks.data[j], rows.data[rows.len - 1 - i][j])) {
                     fprintf(stderr, "could not reallocate %ld bytes: %s\n", stacks.data[j].cap * sizeof(char),
                             strerror(errno));
                     return EXIT_FAILURE;
@@ -168,7 +169,7 @@ int main(int argc, char *argv[]) {
                 if (buffer[m.quantity - 1 - j] == ' ') {
                     continue;
                 }
-                if (!char_stack_push(to, buffer[m.quantity - 1 - j])) {
+                if (not char_stack_push(to, buffer[m.quantity - 1 - j])) {
                     fprintf(stderr, "could not reallocate %ld bytes: %s\n", to->cap * sizeof(char), strerror(errno));
                     return EXIT_FAILURE;
                 }

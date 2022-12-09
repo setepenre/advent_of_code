@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
     FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
-    if (!fptr) {
+    if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
     }
@@ -39,14 +40,14 @@ int main(int argc, char *argv[]) {
     size_t len = 0;
 
     long_array calories = {0, 0, NULL};
-    if (!long_array_append(&calories, 0)) {
+    if (not long_array_append(&calories, 0)) {
         fprintf(stderr, "could not allocate %ld bytes: %s\n", calories.cap * sizeof(long), strerror(errno));
         return EXIT_FAILURE;
     }
 
     while (getline(&line, &len, fptr) != -1) {
         if (strequ(line, "\n")) {
-            if (!long_array_append(&calories, 0)) {
+            if (not long_array_append(&calories, 0)) {
                 fprintf(stderr, "could not reallocate %ld bytes: %s\n", calories.cap * sizeof(long), strerror(errno));
                 return EXIT_FAILURE;
             }
