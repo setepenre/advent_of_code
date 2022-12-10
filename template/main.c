@@ -1,7 +1,7 @@
 #include <errno.h>
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "helpers.h"
 

@@ -2,7 +2,6 @@
 #include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "array.h"
 #include "helpers.h"

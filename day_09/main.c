@@ -1,9 +1,7 @@
 #include <errno.h>
 #include <iso646.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "array.h"
 #include "helpers.h"
@@ -59,19 +57,10 @@ vec2i_t follow(vec2i_t head, vec2i_t tail) {
         return tail;
     }
 
-    vec2i_t delta = {head.x - tail.x, head.y - tail.y};
-    if (abs(delta.x) > abs(delta.y)) {
-        tail.y += delta.y;
-        tail.x += sign(delta.x) * (abs(delta.x) - 1);
-    } else if (abs(delta.y) > abs(delta.x)) {
-        tail.x += delta.x;
-        tail.y += sign(delta.y) * (abs(delta.y) - 1);
-    } else if (abs(delta.x) == abs(delta.y)) {
-        tail.x += sign(delta.x) * (abs(delta.x) - 1);
-        tail.y += sign(delta.y) * (abs(delta.y) - 1);
-    }
+    vec2i_t diff = {head.x - tail.x, head.y - tail.y};
+    vec2i_t delta = {diff.x == 0 ? 0 : sign(diff.x), diff.y == 0 ? 0 : sign(diff.y)};
 
-    return tail;
+    return vec2i_add(tail, delta);
 }
 
 ARRAY(vec2i_t, vec2i_t_array)

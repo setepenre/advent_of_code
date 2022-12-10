@@ -2,7 +2,6 @@
 #include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "array.h"
 #include "helpers.h"
@@ -98,7 +97,8 @@ void delete_tree(node_t *node) {
 
 int usage(const char *name) {
     printf("usage: %s input\n", name);
-    printf("\tinput: path to input file, '-' to use stdin\n");
+    printf("\tinput: path to input file\n");
+    printf("reading file from stdin is not supported.\n");
     return EXIT_FAILURE;
 }
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     }
 
     const char *input = argv[1];
-    FILE *fptr = strequ(input, "-") ? stdin : fopen(input, "r");
+    FILE *fptr = fopen(input, "r");
     if (not fptr) {
         fprintf(stderr, "could not open %s: %s\n", input, strerror(errno));
         return EXIT_FAILURE;
