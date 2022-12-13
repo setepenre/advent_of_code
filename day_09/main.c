@@ -5,6 +5,7 @@
 
 #include "array.h"
 #include "helpers.h"
+#include "vec2i.h"
 
 typedef struct {
     char direction;
@@ -12,18 +13,6 @@ typedef struct {
 } move_t;
 
 ARRAY(move_t, move_t_array)
-
-typedef struct {
-    int x, y;
-} vec2i_t;
-
-static inline bool vec2i_equ(vec2i_t a, vec2i_t b) { return a.x == b.x and a.y == b.y; }
-
-static inline vec2i_t vec2i_add(vec2i_t a, vec2i_t b) {
-    a.x += b.x;
-    a.y += b.y;
-    return a;
-}
 
 vec2i_t delta_from_direction(move_t move) {
     vec2i_t delta = {0, 0};

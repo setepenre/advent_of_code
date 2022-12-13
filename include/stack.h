@@ -1,9 +1,11 @@
+#pragma once
+
 #define STACK(type, typename)                                                                                          \
     typedef struct {                                                                                                   \
         size_t cap, len;                                                                                               \
         type *data;                                                                                                    \
     } typename;                                                                                                        \
-    typename *typename##_push(typename *stack, type value) {                                                           \
+    typename *typename##_push(typename *stack, const type value) {                                                     \
         if (!stack->cap || !stack->data) {                                                                             \
             stack->cap = 1;                                                                                            \
             stack->data = calloc(stack->cap, sizeof(type));                                                            \

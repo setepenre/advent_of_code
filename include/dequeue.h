@@ -1,9 +1,11 @@
+#pragma once
+
 #define DEQUEUE(type, typename)                                                                                        \
     typedef struct {                                                                                                   \
         size_t cap, len;                                                                                               \
         type *buffer, *front;                                                                                          \
     } typename;                                                                                                        \
-    typename *typename##_push_back(typename *dequeue, type value) {                                                    \
+    typename *typename##_push_back(typename *dequeue, const type value) {                                              \
         if (!dequeue->cap || !dequeue->buffer) {                                                                       \
             dequeue->cap = 1;                                                                                          \
             dequeue->buffer = calloc(dequeue->cap, sizeof(type));                                                      \

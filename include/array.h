@@ -1,3 +1,5 @@
+#pragma once
+
 #define ARRAY(type, typename)                                                                                          \
     typedef struct {                                                                                                   \
         size_t cap, len;                                                                                               \
