@@ -18,3 +18,5 @@ extern inline vec2i_t vec2i_add(vec2i_t a, vec2i_t b) {
     a.y += b.y;
     return a;
 }
+
+extern inline vec2i_t vec2i_mul(int a, vec2i_t b) { return vec2i(a * b.x, a * b.y); }

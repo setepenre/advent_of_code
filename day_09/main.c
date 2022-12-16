@@ -39,8 +39,6 @@ static inline bool touching(vec2i_t head, vec2i_t tail) {
     return abs(head.x - tail.x) < 2 and abs(head.y - tail.y) < 2;
 }
 
-int sign(int n) { return n < 0 ? -1 : +1; }
-
 vec2i_t follow(vec2i_t head, vec2i_t tail) {
     if (touching(head, tail)) {
         return tail;
